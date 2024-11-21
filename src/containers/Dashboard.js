@@ -85,30 +85,39 @@ export default class {
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
-  handleEditTicket(e, bill, bills) {
-    if (this.counter === undefined || this.id !== bill.id) this.counter = 0
-    if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
-      bills.forEach(b => {
-        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
-      })
-      $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
-      $('.dashboard-right-container div').html(DashboardFormUI(bill))
-      $('.vertical-navbar').css({ height: '150vh' })
-      this.counter ++
-    } else {
-      $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
-      $('.dashboard-right-container div').html(`
-        <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
-      `)
-      $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
-    }
-    $('#icon-eye-d').click(this.handleClickIconEye)
-    $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
-    $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
+
+  handleEditTicket(e, bill, bills) {
+
+    /**
+ * Suppression de la logique d'alternance via counter, qui empêchait parfois la mise à jour des détails du ticket.
+ * Simplification de la fonction : réinitialise toujours l'apparence des tickets et affiche les détails du ticket sélectionné via son ID avec le DashboardFormUI
+ */
+      // Mise à jour de l'ID du bill sélectionné pour suivre l'état courant
+      this.id = bill.id;
+  
+      // Réinitialise l'apparence de tous les bills dans la liste pour uniformiser l'affichage
+      bills.forEach(b => {
+          $(`#open-bill${b.id}`).css({ background: '#0D5AE5' }); // Restaure la couleur par défaut
+      });
+  
+      // Met en évidence le bill sélectionné en modifiant son apparence
+      $(`#open-bill${bill.id}`).css({ background: '#2A2B35' });
+  
+      // Injecte les détails du bill sélectionné dans la partie droite du tableau de bord
+      $('.dashboard-right-container div').html(DashboardFormUI(bill));
+  
+      // Ajuste dynamiquement la hauteur de la barre de navigation verticale pour s'adapter au contenu
+      $('.vertical-navbar').css({ height: '150vh' });
+  
+      // Détache et réattache les gestionnaires d'événements pour éviter des duplications 
+      $('#icon-eye-d').off('click').on('click', this.handleClickIconEye); // Gestionnaire pour afficher les détails
+      $('#btn-accept-bill').off('click').on('click', (e) => this.handleAcceptSubmit(e, bill)); // Gestionnaire pour accepter un bill
+      $('#btn-refuse-bill').off('click').on('click', (e) => this.handleRefuseSubmit(e, bill)); // Gestionnaire pour refuser un bill
   }
+
+
+
 
   handleAcceptSubmit = (e, bill) => {
     const newBill = {
@@ -146,7 +155,7 @@ export default class {
     }
 
     bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      $(`#open-bill${bill.id}`).off('click').click((e) => this.handleEditTicket(e, bill, bills))  // .off('click') retire les anciens événements 'click' avant d'ajouter le nouveau.
     })
 
     return bills

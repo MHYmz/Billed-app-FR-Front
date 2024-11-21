@@ -25,38 +25,78 @@ describe("Given that I am a user on login page", () => {
       fireEvent.submit(form);
       expect(screen.getByTestId("form-employee")).toBeTruthy();
     });
-  });
+  
+                     
 
-  describe("When I do fill fields in incorrect format and I click on employee button Login In", () => {
+
+    test("Then error occur", () => {
+    document.body.innerHTML = LoginUI(); // Met à jour le contenu HTML du document avec l'UI de connexion
+      const form = screen.getByTestId("form-employee");  // Récupère le formulaire de connexion par son identifiant
+
+
+      // Simule la navigation pour tester la redirection dans le composant
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+
+      let PREVIOUS_LOCATION = "";
+
+
+       // Initialise le composant Login avec les dépendances nécessaires
+      const login = new Login({
+        document,
+        localStorage: window.localStorage,
+        onNavigate,
+        PREVIOUS_LOCATION,
+        store : null,
+      });
+
+     
+      const handleSubmit = jest.fn(login.handleSubmitEmployee); // Crée une fonction simulée pour gérer l'événement de soumission du formulaire
+      login.login = jest.fn().mockResolvedValue(Promise.reject (new Error ("Erreur 500"))); // Simule une erreur lors de la tentative de connexion (Erreur 500)
+      form.addEventListener("submit", handleSubmit); // Ajoute un gestionnaire d'événements pour la soumission du formulaire
+      fireEvent.submit(form); // Déclenche la soumission du formulaire
+      expect(handleSubmit).toHaveBeenCalled();   // Vérifie que la fonction de gestion de soumission a été appelée
+     });
+   });
+
+
+
+      
+  describe("When I do fill fields in incorrect format and I click on employee button Login In", () => { 
     test("Then It should renders Login page", () => {
       document.body.innerHTML = LoginUI();
 
-      const inputEmailUser = screen.getByTestId("employee-email-input");
-      fireEvent.change(inputEmailUser, { target: { value: "pasunemail" } });
+      const inputEmailUser = screen.getByTestId("employee-email-input"); 
+      fireEvent.change(inputEmailUser, { target: { value: "pasunemail" } }); 
       expect(inputEmailUser.value).toBe("pasunemail");
 
-      const inputPasswordUser = screen.getByTestId("employee-password-input");
+      const inputPasswordUser = screen.getByTestId("employee-password-input"); 
       fireEvent.change(inputPasswordUser, { target: { value: "azerty" } });
       expect(inputPasswordUser.value).toBe("azerty");
 
-      const form = screen.getByTestId("form-employee");
+      const form = screen.getByTestId("form-employee"); 
       const handleSubmit = jest.fn((e) => e.preventDefault());
 
       form.addEventListener("submit", handleSubmit);
-      fireEvent.submit(form);
-      expect(screen.getByTestId("form-employee")).toBeTruthy();
+      fireEvent.submit(form); 
+      expect(screen.getByTestId("form-employee")).toBeTruthy(); 
     });
   });
 
-  describe("When I do fill fields in correct format and I click on employee button Login In", () => {
-    test("Then I should be identified as an Employee in app", () => {
+
+
+
+
+  describe("When I do fill fields in correct format and I click on employee button Login In", () => { 
+    test("Then I should be identified as an HR admin in app", () => { // Ajout de HR admin 
       document.body.innerHTML = LoginUI();
       const inputData = {
         email: "johndoe@email.com",
         password: "azerty",
       };
 
-      const inputEmailUser = screen.getByTestId("employee-email-input");
+      const inputEmailUser = screen.getByTestId("employee-email-input"); 
       fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
       expect(inputEmailUser.value).toBe(inputData.email);
 
@@ -111,7 +151,9 @@ describe("Given that I am a user on login page", () => {
       );
     });
 
-    test("It should renders Bills page", () => {
+
+                                
+test("It should renders Bills page", () => {
       expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
     });
   });
@@ -137,6 +179,10 @@ describe("Given that I am a user on login page", () => {
     });
   });
 
+
+
+
+
   describe("When I do fill fields in incorrect format and I click on admin button Login In", () => {
     test("Then it should renders Login page", () => {
       document.body.innerHTML = LoginUI();
@@ -157,6 +203,8 @@ describe("Given that I am a user on login page", () => {
       expect(screen.getByTestId("form-admin")).toBeTruthy();
     });
   });
+
+
 
   describe("When I do fill fields in correct format and I click on admin button Login In", () => {
     test("Then I should be identified as an HR admin in app", () => {
@@ -188,6 +236,7 @@ describe("Given that I am a user on login page", () => {
         },
         writable: true,
       });
+
 
       // we have to mock navigation to test it
       const onNavigate = (pathname) => {
@@ -223,8 +272,41 @@ describe("Given that I am a user on login page", () => {
       );
     });
 
+
     test("It should renders HR dashboard page", () => {
       expect(screen.queryByText("Validations")).toBeTruthy();
+    });
+
+
+
+// Test du scénario où une erreur se produit lors de la connexion                               
+test("Then error occur", () => {
+  document.body.innerHTML = LoginUI();  // Initialise l'UI de login
+  const form = screen.getByTestId("form-admin");  // Récupère le formulaire de login
+
+  const onNavigate = (pathname) => {  // Mock de la fonction de navigation
+    document.body.innerHTML = ROUTES({ pathname });
+  };
+
+  let PREVIOUS_LOCATION = "";  // Localisation précédente (non utilisée ici)
+
+  const login = new Login({  // Crée une instance de Login
+    document,
+    localStorage: window.localStorage,
+    onNavigate,
+    PREVIOUS_LOCATION,
+    store: null,
+  });
+
+  const handleSubmit = jest.fn(login.handleSubmitAdmin);  // Mock la soumission du formulaire
+
+  login.login = jest.fn().mockResolvedValue(Promise.reject(new Error("Erreur 500")));  // Simule une erreur de connexion (Erreur 500)
+  
+  form.addEventListener("submit", handleSubmit);  // Ajoute l'événement de soumission
+  
+  fireEvent.submit(form);  // Déclenche la soumission
+
+  expect(handleSubmit).toHaveBeenCalled();  // Vérifie que handleSubmit a été appelé
     });
   });
 });

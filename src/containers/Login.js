@@ -41,8 +41,8 @@ export default class Login {
     e.preventDefault()
     const user = {
       type: "Admin",
-      email: e.target.querySelector(`input[data-testid="employee-email-input"]`).value,
-      password: e.target.querySelector(`input[data-testid="employee-password-input"]`).value,
+      email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value, // Modification 01 Ajout de "admin" Et Suppression de "employee"
+      password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value, // Modification 02 Ajout de "admin" Et Suppression de "employee"
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
@@ -78,12 +78,14 @@ export default class Login {
     if (this.store) {
       return this.store
       .users()
-      .create({data:JSON.stringify({
+      .create({
+        data:JSON.stringify({
         type: user.type,
         name: user.email.split('@')[0],
         email: user.email,
         password: user.password,
-      })})
+      })
+    })
       .then(() => {
         console.log(`User with ${user.email} is created`)
         return this.login(user)

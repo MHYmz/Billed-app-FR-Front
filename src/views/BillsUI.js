@@ -48,6 +48,8 @@ export default ({ data: bills, loading, error }) => {
     return ErrorPage(error)
   }
   
+  console.log('Bills date;', bills); // Ajout de console.log
+  
   return (`
     <div class='layout'>
       ${VerticalLayout(120)}
